@@ -4,9 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DRAFT ROOM</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&family=JetBrains+Mono:wght@300;400;500;700&family=Inter:wght@300;400;600;700&family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
         :root {
@@ -15,9 +12,8 @@
             --text-color: #e2e8f0;
             --accent-color: #3b82f6;
             --border-color: #2a2a32;
-            --gutter-color: #4a4a5a;
             --font-size: 16px;
-            --font-family: 'JetBrains Mono', monospace;
+            --font-family: 'Courier New', Courier, monospace;
         }
 
         * {
@@ -49,7 +45,7 @@
         }
 
         .brand {
-            font-family: 'Space Grotesk', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             font-weight: 700;
             letter-spacing: 2px;
             font-size: 1.2rem;
@@ -82,7 +78,7 @@
             border: none;
             color: #71717a;
             padding: 8px 16px;
-            font-family: 'Space Grotesk', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             font-weight: 600;
             font-size: 0.9rem;
             cursor: pointer;
@@ -150,26 +146,6 @@
             margin-left: -290px;
         }
 
-        .sidebar-toggle-btn {
-            background-color: var(--bg-color);
-            border: 1px solid var(--border-color);
-            color: #a1a1aa;
-            font-family: 'Space Grotesk', sans-serif;
-            font-weight: 600;
-            padding: 8px;
-            border-radius: 4px;
-            cursor: pointer;
-            text-align: center;
-            font-size: 0.8rem;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-
-        .sidebar-toggle-btn:hover {
-            color: #ffffff;
-            background-color: var(--border-color);
-        }
-
         .setting-group {
             display: flex;
             flex-direction: column;
@@ -182,6 +158,7 @@
             letter-spacing: 1px;
             color: #71717a;
             font-weight: 700;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
         }
 
         .setting-group select {
@@ -192,19 +169,20 @@
             padding: 8px;
             border-radius: 4px;
             outline: none;
+            font-family: inherit;
         }
 
-        /* Custom Color Picker + Hex Input Layout */
+        /* Full Custom System Color Layout Block */
         .color-picker-wrapper {
             display: flex;
-            gap: 8px;
+            gap: 12px;
             align-items: center;
         }
 
         .color-picker-wrapper input[type="color"] {
             -webkit-appearance: none;
             border: none;
-            width: 38px;
+            width: 100%;
             height: 38px;
             border-radius: 4px;
             cursor: pointer;
@@ -220,23 +198,6 @@
             border-radius: 4px;
         }
 
-        .color-hex-input {
-            flex: 1;
-            background-color: var(--bg-color);
-            border: 1px solid var(--border-color);
-            color: var(--text-color);
-            padding: 8px 12px;
-            border-radius: 4px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.9rem;
-            outline: none;
-            text-transform: uppercase;
-        }
-
-        .color-hex-input:focus {
-            border-color: var(--accent-color);
-        }
-
         .zoom-controls {
             display: flex;
             gap: 8px;
@@ -250,6 +211,7 @@
             color: var(--text-color);
             cursor: pointer;
             border-radius: 4px;
+            font-family: inherit;
         }
 
         /* Editor Wrapper Container */
@@ -271,33 +233,12 @@
             position: relative;
             outline: none;
             padding-bottom: 200px;
+            line-height: 1.5;
         }
 
         /* LYRICS MODE */
         .editor-paper.mode-lyrics {
-            padding-left: 60px;
             white-space: pre-wrap;
-        }
-
-        .bar-gutter {
-            position: absolute;
-            left: 40px;
-            top: 40px;
-            width: 45px;
-            text-align: right;
-            user-select: none;
-            pointer-events: none;
-            font-family: var(--font-family);
-            font-size: 0.8em;
-            color: var(--gutter-color);
-            opacity: 0.5;
-            line-height: inherit;
-            z-index: 2;
-        }
-
-        .bar-number {
-            display: block;
-            height: var(--line-height);
         }
 
         /* A/V MODE (Split Layout Table) */
@@ -321,6 +262,7 @@
             min-height: 100px;
             outline: none;
             border-right: 1px solid var(--border-color);
+            line-height: 1.5;
         }
 
         .av-cell:last-child {
@@ -335,6 +277,7 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             border-radius: 6px 6px 0 0;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
         }
 
         .av-header-cell {
@@ -346,16 +289,15 @@
         .add-row-btn {
             align-self: flex-start;
             margin-top: 10px;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
         }
 
-        /* SCREENPLAY MODE */
+        /* SCREENPLAY MODE (Styled Dark inside App) */
         .editor-paper.mode-screenplay {
-            font-family: 'Courier Prime', monospace !important;
+            font-family: 'Courier New', Courier, monospace !important;
             max-width: 750px;
-            background-color: #ffffff;
-            color: #111111;
             padding: 60px 80px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
             min-height: 11in;
         }
 
@@ -379,7 +321,7 @@
             align-items: center;
             gap: 10px;
             font-size: 0.9rem;
-            font-family: 'Inter', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
             color: var(--text-color);
         }
 
@@ -403,9 +345,10 @@
             margin-top: 16px;
             margin-bottom: 4px;
             letter-spacing: 1px;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
         }
 
-        /* Print Settings to force pure PDF layouts */
+        /* Print Settings to force pure PDF black and white layouts */
         @media print {
             body, .editor-container, .workspace {
                 background: white !important;
@@ -413,7 +356,7 @@
                 overflow: visible !important;
                 height: auto !important;
             }
-            header, .settings-sidebar, .custom-context-menu, .add-row-btn, .control-btn, .bar-gutter {
+            header, .settings-sidebar, .custom-context-menu, .add-row-btn, .control-btn {
                 display: none !important;
             }
             .editor-container {
@@ -425,8 +368,8 @@
                 max-width: 100% !important;
             }
             .editor-paper.mode-screenplay {
-                color: black !important;
-                background: white !important;
+                color: #111111 !important;
+                background: #ffffff !important;
                 padding: 0 !important;
             }
             .av-row {
@@ -451,7 +394,7 @@
 
     <header>
         <div style="display: flex; align-items: center; gap: 16px;">
-            <button class="control-btn" id="globalSidebarToggle" onclick="toggleSidebar()" title="Toggle Sidebar Panel">☰</button>
+            <button class="control-btn" id="globalSidebarToggle" onclick="toggleSidebar()" style="font-size:1.15rem; padding: 6px 12px;" title="Toggle Sidebar Panel">☰</button>
             <div class="brand">DRAFT ROOM</div>
         </div>
         
@@ -470,15 +413,12 @@
     <div class="workspace">
         
         <aside class="settings-sidebar" id="sidebarPanel">
-            <button class="sidebar-toggle-btn" onclick="toggleSidebar()">Collapse Panel ✕</button>
-
             <div class="setting-group">
                 <label>Typography</label>
                 <select id="fontFamilySelect" onchange="updateFontFamily(this.value)">
-                    <option value="'JetBrains Mono', monospace">JetBrains Mono</option>
-                    <option value="'Courier Prime', monospace">Courier Prime</option>
-                    <option value="'Inter', sans-serif">Inter Standard</option>
-                    <option value="'Space Grotesk', sans-serif">Space Grotesk</option>
+                    <option value="'Courier New', Courier, monospace">Courier Monospace</option>
+                    <option value="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">System Sans-Serif</option>
+                    <option value="Georgia, serif">Classic Serif</option>
                 </select>
             </div>
 
@@ -493,30 +433,26 @@
             <div class="setting-group">
                 <label>Canvas Environment</label>
                 <div class="color-picker-wrapper">
-                    <input type="color" id="bgColorPicker" value="#121214" oninput="syncColorInput('bg', this.value)">
-                    <input type="text" id="bgColorHex" class="color-hex-input" value="#121214" oninput="syncColorInput('bg', this.value)">
+                    <input type="color" id="bgColorPicker" value="#121214" oninput="applyColorChange('bg', this.value)">
                 </div>
             </div>
 
             <div class="setting-group">
                 <label>Text Foundation</label>
                 <div class="color-picker-wrapper">
-                    <input type="color" id="textColorPicker" value="#e2e8f0" oninput="syncColorInput('text', this.value)">
-                    <input type="text" id="textColorHex" class="color-hex-input" value="#e2e8f0" oninput="syncColorInput('text', this.value)">
+                    <input type="color" id="textColorPicker" value="#e2e8f0" oninput="applyColorChange('text', this.value)">
                 </div>
             </div>
             
             <div class="setting-group">
                 <label>Panel Interface</label>
                 <div class="color-picker-wrapper">
-                    <input type="color" id="panelColorPicker" value="#1a1a1e" oninput="syncColorInput('panel', this.value)">
-                    <input type="text" id="panelColorHex" class="color-hex-input" value="#1a1a1e" oninput="syncColorInput('panel', this.value)">
+                    <input type="color" id="panelColorPicker" value="#1a1a1e" oninput="applyColorChange('panel', this.value)">
                 </div>
             </div>
         </aside>
 
         <div class="editor-container" id="editorContainer">
-            <div class="bar-gutter" id="barGutter"></div>
             
             <div class="editor-paper mode-lyrics" id="editor" contenteditable="true" spellcheck="false"></div>
 
@@ -559,7 +495,6 @@
         const editor = document.getElementById('editor');
         const avContainer = document.getElementById('avContainer');
         const avRowsWrapper = document.getElementById('avRowsWrapper');
-        const barGutter = document.getElementById('barGutter');
         const contextMenu = document.getElementById('contextMenu');
         const sidebarPanel = document.getElementById('sidebarPanel');
         
@@ -571,13 +506,15 @@
             Lyrics: 'draftroom_lyrics_content',
             'A/V': 'draftroom_av_content',
             Screenplay: 'draftroom_screenplay_content',
-            Theme: 'draftroom_theme_config'
+            Theme: 'draftroom_theme_config',
+            Font: 'draftroom_font_config'
         };
 
         const VALID_COMMANDS = ['/verse', '/chorus', '/hook', '/bridge', '/intro', '/outro', '/pre-chorus'];
 
         window.addEventListener('DOMContentLoaded', () => {
             loadThemeSettings();
+            loadFontSetting();
             loadContent(currentMode);
             setupEditorListeners();
             setupContextMenu();
@@ -587,7 +524,7 @@
             editor.addEventListener('input', () => {
                 triggerAutosave();
                 if (currentMode === 'Lyrics') {
-                    processBarsAndSlashCommands();
+                    processSlashCommands();
                 }
             });
 
@@ -625,22 +562,15 @@
             editor.className = 'editor-paper';
             editor.style.display = 'block';
             avContainer.style.display = 'none';
-            barGutter.style.display = 'none';
 
-            if (selectedMode !== 'Screenplay') {
-                const storedTheme = JSON.parse(localStorage.getItem(STORAGE_KEYS.Theme) || '{}');
-                document.documentElement.style.setProperty('--bg-color', storedTheme.bg || '#121214');
-                document.documentElement.style.setProperty('--text-color', storedTheme.text || '#e2e8f0');
-            } else {
-                document.documentElement.style.setProperty('--bg-color', '#ffffff');
-                document.documentElement.style.setProperty('--text-color', '#111111');
-            }
+            // Maintain persistent global canvas backgrounds across modes seamlessly
+            const storedTheme = JSON.parse(localStorage.getItem(STORAGE_KEYS.Theme) || '{}');
+            document.documentElement.style.setProperty('--bg-color', storedTheme.bg || '#121214');
+            document.documentElement.style.setProperty('--text-color', storedTheme.text || '#e2e8f0');
 
             if (selectedMode === 'Lyrics') {
                 editor.classList.add('mode-lyrics');
-                barGutter.style.display = 'block';
                 loadContent('Lyrics');
-                processBarsAndSlashCommands();
             } else if (selectedMode === 'A/V') {
                 editor.style.display = 'none';
                 avContainer.style.display = 'flex';
@@ -651,32 +581,25 @@
             }
         }
 
-        // Safe Slash Command Parser Engine - Prevents Surrounding Block Deletions
-        function processBarsAndSlashCommands() {
+        function processSlashCommands() {
             const selection = window.getSelection();
             if (!selection.rangeCount) return;
 
-            // Run through the raw inner block nodes directly
             const lines = editor.innerText.split('\n');
-            let barCount = 1;
-            let gutterHTML = '';
 
             for (let i = 0; i < lines.length; i++) {
                 let currentLineText = lines[i].trim();
 
-                // Safe Replacement Node Intercept Logic
                 if (VALID_COMMANDS.includes(currentLineText.toLowerCase())) {
                     const matchedTag = currentLineText.substring(1).toUpperCase();
-                    
                     const range = selection.getRangeAt(0);
                     const textNode = range.startContainer;
                     
-                    // Directly swap the active slash line text value node only
                     if (textNode.nodeType === Node.TEXT_NODE) {
                         const rawStringValue = textNode.nodeValue;
                         for (let command of VALID_COMMANDS) {
                             if (rawStringValue.toLowerCase().includes(command)) {
-                                textNode.nodeValue = ''; // Clear only the targeted slash text chunk safely
+                                textNode.nodeValue = ''; 
                                 const tagHtml = `<span class="section-tag" contenteditable="false">[${matchedTag}]</span><div><br></div>`;
                                 document.execCommand('insertHTML', false, tagHtml);
                                 triggerAutosave();
@@ -685,15 +608,7 @@
                         }
                     }
                 }
-
-                if (currentLineText === '' || currentLineText === '\u200B') {
-                    gutterHTML += '<div class="bar-number">&nbsp;</div>';
-                } else {
-                    gutterHTML += `<div class="bar-number">${barCount}</div>`;
-                    barCount++;
-                }
             }
-            barGutter.innerHTML = gutterHTML;
         }
 
         function handleScreenplayFormatting() {
@@ -778,6 +693,15 @@
 
         function updateFontFamily(fontValue) {
             document.documentElement.style.setProperty('--font-family', fontValue);
+            localStorage.setItem(STORAGE_KEYS.Font, fontValue);
+        }
+
+        function loadFontSetting() {
+            const storedFont = localStorage.getItem(STORAGE_KEYS.Font);
+            if (storedFont) {
+                document.documentElement.style.setProperty('--font-family', storedFont);
+                document.getElementById('fontFamilySelect').value = storedFont;
+            }
         }
 
         function adjustZoom(direction) {
@@ -787,36 +711,19 @@
             document.documentElement.style.setProperty('--font-size', currentZoom + 'px');
         }
 
-        // Hex Code text strings + Picker synchronizations 
-        function syncColorInput(target, value) {
-            if (!value.startsWith('#')) {
-                if (value.length === 6 || value.length === 3) value = '#' + value;
-            }
-            
-            // Validate structural pattern limits before layout overrides occur
-            const hexRegex = /^#[0-9A-F]{6}$/i;
+        function applyColorChange(target, value) {
+            const storedTheme = JSON.parse(localStorage.getItem(STORAGE_KEYS.Theme) || '{}');
             
             if (target === 'bg') {
-                document.getElementById('bgColorPicker').value = value;
-                document.getElementById('bgColorHex').value = value;
-                if (currentMode !== 'Screenplay') document.documentElement.style.setProperty('--bg-color', value);
-                updateStoredTheme('bg', value);
+                document.documentElement.style.setProperty('--bg-color', value);
+                storedTheme.bg = value;
             } else if (target === 'text') {
-                document.getElementById('textColorPicker').value = value;
-                document.getElementById('textColorHex').value = value;
-                if (currentMode !== 'Screenplay') document.documentElement.style.setProperty('--text-color', value);
-                updateStoredTheme('text', value);
+                document.documentElement.style.setProperty('--text-color', value);
+                storedTheme.text = value;
             } else if (target === 'panel') {
-                document.getElementById('panelColorPicker').value = value;
-                document.getElementById('panelColorHex').value = value;
                 document.documentElement.style.setProperty('--panel-bg', value);
-                updateStoredTheme('panel', value);
+                storedTheme.panel = value;
             }
-        }
-
-        function updateStoredTheme(key, val) {
-            const storedTheme = JSON.parse(localStorage.getItem(STORAGE_KEYS.Theme) || '{}');
-            storedTheme[key] = val;
             localStorage.setItem(STORAGE_KEYS.Theme, JSON.stringify(storedTheme));
         }
 
@@ -825,17 +732,14 @@
             if (storedTheme.bg) {
                 document.documentElement.style.setProperty('--bg-color', storedTheme.bg);
                 document.getElementById('bgColorPicker').value = storedTheme.bg;
-                document.getElementById('bgColorHex').value = storedTheme.bg;
             }
             if (storedTheme.text) {
                 document.documentElement.style.setProperty('--text-color', storedTheme.text);
                 document.getElementById('textColorPicker').value = storedTheme.text;
-                document.getElementById('textColorHex').value = storedTheme.text;
             }
             if (storedTheme.panel) {
                 document.documentElement.style.setProperty('--panel-bg', storedTheme.panel);
                 document.getElementById('panelColorPicker').value = storedTheme.panel;
-                document.getElementById('panelColorHex').value = storedTheme.panel;
             }
         }
 
