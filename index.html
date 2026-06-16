@@ -190,4 +190,705 @@
             border: 1px solid var(--border-color);
             color: var(--text-color);
             padding: 8px;
-            border-radius:
+            border-radius: 4px;
+            outline: none;
+        }
+
+        /* Custom Color Picker + Hex Input Layout */
+        .color-picker-wrapper {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .color-picker-wrapper input[type="color"] {
+            -webkit-appearance: none;
+            border: none;
+            width: 38px;
+            height: 38px;
+            border-radius: 4px;
+            cursor: pointer;
+            background: transparent;
+        }
+
+        .color-picker-wrapper input[type="color"]::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+
+        .color-picker-wrapper input[type="color"]::-webkit-color-swatch {
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+        }
+
+        .color-hex-input {
+            flex: 1;
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            outline: none;
+            text-transform: uppercase;
+        }
+
+        .color-hex-input:focus {
+            border-color: var(--accent-color);
+        }
+
+        .zoom-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .zoom-controls button {
+            flex: 1;
+            padding: 8px;
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        /* Editor Wrapper Container */
+        .editor-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 40px;
+            display: flex;
+            justify-content: center;
+            background-color: var(--bg-color);
+            position: relative;
+            transition: background-color 0.3s ease;
+        }
+
+        .editor-paper {
+            width: 100%;
+            max-width: 850px;
+            min-height: 100%;
+            position: relative;
+            outline: none;
+            padding-bottom: 200px;
+        }
+
+        /* LYRICS MODE */
+        .editor-paper.mode-lyrics {
+            padding-left: 60px;
+            white-space: pre-wrap;
+        }
+
+        .bar-gutter {
+            position: absolute;
+            left: 40px;
+            top: 40px;
+            width: 45px;
+            text-align: right;
+            user-select: none;
+            pointer-events: none;
+            font-family: var(--font-family);
+            font-size: 0.8em;
+            color: var(--gutter-color);
+            opacity: 0.5;
+            line-height: inherit;
+            z-index: 2;
+        }
+
+        .bar-number {
+            display: block;
+            height: var(--line-height);
+        }
+
+        /* A/V MODE (Split Layout Table) */
+        .av-container {
+            display: none;
+            width: 100%;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .av-row {
+            display: flex;
+            border: 1px solid var(--border-color);
+            background: var(--panel-bg);
+            border-radius: 6px;
+        }
+
+        .av-cell {
+            flex: 1;
+            padding: 15px;
+            min-height: 100px;
+            outline: none;
+            border-right: 1px solid var(--border-color);
+        }
+
+        .av-cell:last-child {
+            border-right: none;
+        }
+
+        .av-header-row {
+            display: flex;
+            background: var(--border-color);
+            font-weight: bold;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-radius: 6px 6px 0 0;
+        }
+
+        .av-header-cell {
+            flex: 1;
+            padding: 10px 15px;
+            color: #a1a1aa;
+        }
+
+        .add-row-btn {
+            align-self: flex-start;
+            margin-top: 10px;
+        }
+
+        /* SCREENPLAY MODE */
+        .editor-paper.mode-screenplay {
+            font-family: 'Courier Prime', monospace !important;
+            max-width: 750px;
+            background-color: #ffffff;
+            color: #111111;
+            padding: 60px 80px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            min-height: 11in;
+        }
+
+        /* Custom Right-Click Menu Styles */
+        .custom-context-menu {
+            position: absolute;
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+            padding: 6px 0;
+            display: none;
+            z-index: 1000;
+            width: 180px;
+        }
+
+        .menu-item {
+            padding: 8px 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            font-family: 'Inter', sans-serif;
+            color: var(--text-color);
+        }
+
+        .menu-item:hover {
+            background-color: var(--border-color);
+        }
+
+        .color-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        /* Inline structural styling tags injected dynamically */
+        .section-tag {
+            display: block;
+            font-weight: bold;
+            color: #ff3e3e;
+            text-transform: uppercase;
+            margin-top: 16px;
+            margin-bottom: 4px;
+            letter-spacing: 1px;
+        }
+
+        /* Print Settings to force pure PDF layouts */
+        @media print {
+            body, .editor-container, .workspace {
+                background: white !important;
+                color: black !important;
+                overflow: visible !important;
+                height: auto !important;
+            }
+            header, .settings-sidebar, .custom-context-menu, .add-row-btn, .control-btn, .bar-gutter {
+                display: none !important;
+            }
+            .editor-container {
+                padding: 0 !important;
+            }
+            .editor-paper {
+                box-shadow: none !important;
+                padding: 0 !important;
+                max-width: 100% !important;
+            }
+            .editor-paper.mode-screenplay {
+                color: black !important;
+                background: white !important;
+                padding: 0 !important;
+            }
+            .av-row {
+                page-break-inside: avoid;
+                border: 1px solid #000000 !important;
+                background: white !important;
+            }
+            .av-cell {
+                border-right: 1px solid #000000 !important;
+                color: black !important;
+            }
+            .av-header-row {
+                background: #eeeeee !important;
+            }
+            .av-header-cell {
+                color: black !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div style="display: flex; align-items: center; gap: 16px;">
+            <button class="control-btn" id="globalSidebarToggle" onclick="toggleSidebar()" title="Toggle Sidebar Panel">☰</button>
+            <div class="brand">DRAFT ROOM</div>
+        </div>
+        
+        <div class="modes">
+            <button class="mode-btn active" onclick="switchMode('Lyrics')">Lyrics</button>
+            <button class="mode-btn" onclick="switchMode('A/V')">A/V</button>
+            <button class="mode-btn" onclick="switchMode('Screenplay')">Screenplay</button>
+        </div>
+
+        <div class="actions">
+            <button class="control-btn" onclick="exportTXT()">Export TXT</button>
+            <button class="control-btn" onclick="exportPDF()">Export PDF</button>
+        </div>
+    </header>
+
+    <div class="workspace">
+        
+        <aside class="settings-sidebar" id="sidebarPanel">
+            <button class="sidebar-toggle-btn" onclick="toggleSidebar()">Collapse Panel ✕</button>
+
+            <div class="setting-group">
+                <label>Typography</label>
+                <select id="fontFamilySelect" onchange="updateFontFamily(this.value)">
+                    <option value="'JetBrains Mono', monospace">JetBrains Mono</option>
+                    <option value="'Courier Prime', monospace">Courier Prime</option>
+                    <option value="'Inter', sans-serif">Inter Standard</option>
+                    <option value="'Space Grotesk', sans-serif">Space Grotesk</option>
+                </select>
+            </div>
+
+            <div class="setting-group">
+                <label>Scaling</label>
+                <div class="zoom-controls">
+                    <button onclick="adjustZoom(-1)">A-</button>
+                    <button onclick="adjustZoom(1)">A+</button>
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <label>Canvas Environment</label>
+                <div class="color-picker-wrapper">
+                    <input type="color" id="bgColorPicker" value="#121214" oninput="syncColorInput('bg', this.value)">
+                    <input type="text" id="bgColorHex" class="color-hex-input" value="#121214" oninput="syncColorInput('bg', this.value)">
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <label>Text Foundation</label>
+                <div class="color-picker-wrapper">
+                    <input type="color" id="textColorPicker" value="#e2e8f0" oninput="syncColorInput('text', this.value)">
+                    <input type="text" id="textColorHex" class="color-hex-input" value="#e2e8f0" oninput="syncColorInput('text', this.value)">
+                </div>
+            </div>
+            
+            <div class="setting-group">
+                <label>Panel Interface</label>
+                <div class="color-picker-wrapper">
+                    <input type="color" id="panelColorPicker" value="#1a1a1e" oninput="syncColorInput('panel', this.value)">
+                    <input type="text" id="panelColorHex" class="color-hex-input" value="#1a1a1e" oninput="syncColorInput('panel', this.value)">
+                </div>
+            </div>
+        </aside>
+
+        <div class="editor-container" id="editorContainer">
+            <div class="bar-gutter" id="barGutter"></div>
+            
+            <div class="editor-paper mode-lyrics" id="editor" contenteditable="true" spellcheck="false"></div>
+
+            <div class="av-container" id="avContainer">
+                <div class="av-header-row">
+                    <div class="av-header-cell">Visual Execution</div>
+                    <div class="av-header-cell">Audio Narrative / Blueprint</div>
+                </div>
+                <div id="avRowsWrapper">
+                    <div class="av-row">
+                        <div class="av-cell" contenteditable="true" spellcheck="false"></div>
+                        <div class="av-cell" contenteditable="true" spellcheck="false"></div>
+                    </div>
+                </div>
+                <button class="control-btn add-row-btn" onclick="addAVRow()">+ Append Timeline Row</button>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="custom-context-menu" id="contextMenu">
+        <div class="menu-item" onclick="applyHighlight('#ffffff')">
+            <div class="color-dot" style="background: #ffffff;"></div> Default
+        </div>
+        <div class="menu-item" onclick="applyHighlight('#ff4444')">
+            <div class="color-dot" style="background: #ff4444;"></div> Structural Red
+        </div>
+        <div class="menu-item" onclick="applyHighlight('#3b82f6')">
+            <div class="color-dot" style="background: #3b82f6;"></div> Cadence Blue
+        </div>
+        <div class="menu-item" onclick="applyHighlight('#eab308')">
+            <div class="color-dot" style="background: #eab308;"></div> Chorus Gold
+        </div>
+        <div class="menu-item" onclick="applyHighlight('#22c55e')">
+            <div class="color-dot" style="background: #22c55e;"></div> Hook Emerald
+        </div>
+    </div>
+
+    <script>
+        const editor = document.getElementById('editor');
+        const avContainer = document.getElementById('avContainer');
+        const avRowsWrapper = document.getElementById('avRowsWrapper');
+        const barGutter = document.getElementById('barGutter');
+        const contextMenu = document.getElementById('contextMenu');
+        const sidebarPanel = document.getElementById('sidebarPanel');
+        
+        let currentMode = 'Lyrics';
+        let currentZoom = 16;
+        let autosaveTimeout = null;
+
+        const STORAGE_KEYS = {
+            Lyrics: 'draftroom_lyrics_content',
+            'A/V': 'draftroom_av_content',
+            Screenplay: 'draftroom_screenplay_content',
+            Theme: 'draftroom_theme_config'
+        };
+
+        const VALID_COMMANDS = ['/verse', '/chorus', '/hook', '/bridge', '/intro', '/outro', '/pre-chorus'];
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadThemeSettings();
+            loadContent(currentMode);
+            setupEditorListeners();
+            setupContextMenu();
+        });
+
+        function setupEditorListeners() {
+            editor.addEventListener('input', () => {
+                triggerAutosave();
+                if (currentMode === 'Lyrics') {
+                    processBarsAndSlashCommands();
+                }
+            });
+
+            avContainer.addEventListener('input', () => {
+                triggerAutosave();
+            });
+
+            editor.addEventListener('keydown', (e) => {
+                if (currentMode === 'Screenplay' && e.key === 'Tab') {
+                    e.preventDefault();
+                    handleScreenplayFormatting();
+                }
+            });
+        }
+
+        function toggleSidebar() {
+            sidebarPanel.classList.toggle('collapsed');
+        }
+
+        function triggerAutosave() {
+            clearTimeout(autosaveTimeout);
+            autosaveTimeout = setTimeout(() => {
+                saveContent(currentMode);
+            }, 300); 
+        }
+
+        function switchMode(selectedMode) {
+            saveContent(currentMode);
+            currentMode = selectedMode;
+
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.innerText === selectedMode);
+            });
+
+            editor.className = 'editor-paper';
+            editor.style.display = 'block';
+            avContainer.style.display = 'none';
+            barGutter.style.display = 'none';
+
+            if (selectedMode !== 'Screenplay') {
+                const storedTheme = JSON.parse(localStorage.getItem(STORAGE_KEYS.Theme) || '{}');
+                document.documentElement.style.setProperty('--bg-color', storedTheme.bg || '#121214');
+                document.documentElement.style.setProperty('--text-color', storedTheme.text || '#e2e8f0');
+            } else {
+                document.documentElement.style.setProperty('--bg-color', '#ffffff');
+                document.documentElement.style.setProperty('--text-color', '#111111');
+            }
+
+            if (selectedMode === 'Lyrics') {
+                editor.classList.add('mode-lyrics');
+                barGutter.style.display = 'block';
+                loadContent('Lyrics');
+                processBarsAndSlashCommands();
+            } else if (selectedMode === 'A/V') {
+                editor.style.display = 'none';
+                avContainer.style.display = 'flex';
+                loadContent('A/V');
+            } else if (selectedMode === 'Screenplay') {
+                editor.classList.add('mode-screenplay');
+                loadContent('Screenplay');
+            }
+        }
+
+        // Safe Slash Command Parser Engine - Prevents Surrounding Block Deletions
+        function processBarsAndSlashCommands() {
+            const selection = window.getSelection();
+            if (!selection.rangeCount) return;
+
+            // Run through the raw inner block nodes directly
+            const lines = editor.innerText.split('\n');
+            let barCount = 1;
+            let gutterHTML = '';
+
+            for (let i = 0; i < lines.length; i++) {
+                let currentLineText = lines[i].trim();
+
+                // Safe Replacement Node Intercept Logic
+                if (VALID_COMMANDS.includes(currentLineText.toLowerCase())) {
+                    const matchedTag = currentLineText.substring(1).toUpperCase();
+                    
+                    const range = selection.getRangeAt(0);
+                    const textNode = range.startContainer;
+                    
+                    // Directly swap the active slash line text value node only
+                    if (textNode.nodeType === Node.TEXT_NODE) {
+                        const rawStringValue = textNode.nodeValue;
+                        for (let command of VALID_COMMANDS) {
+                            if (rawStringValue.toLowerCase().includes(command)) {
+                                textNode.nodeValue = ''; // Clear only the targeted slash text chunk safely
+                                const tagHtml = `<span class="section-tag" contenteditable="false">[${matchedTag}]</span><div><br></div>`;
+                                document.execCommand('insertHTML', false, tagHtml);
+                                triggerAutosave();
+                                return;
+                            }
+                        }
+                    }
+                }
+
+                if (currentLineText === '' || currentLineText === '\u200B') {
+                    gutterHTML += '<div class="bar-number">&nbsp;</div>';
+                } else {
+                    gutterHTML += `<div class="bar-number">${barCount}</div>`;
+                    barCount++;
+                }
+            }
+            barGutter.innerHTML = gutterHTML;
+        }
+
+        function handleScreenplayFormatting() {
+            const selection = window.getSelection();
+            if (!selection.rangeCount) return;
+
+            let containerElement = selection.getRangeAt(0).startContainer;
+            while (containerElement.nodeType !== Node.ELEMENT_NODE) {
+                containerElement = containerElement.parentNode;
+            }
+
+            const currentMargin = containerElement.style.marginLeft;
+
+            if (currentMargin === '' || currentMargin === '0px') {
+                containerElement.style.marginLeft = '40%';
+                containerElement.style.marginRight = '10%';
+                containerElement.style.textTransform = 'uppercase';
+            } else if (currentMargin === '40%') {
+                containerElement.style.marginLeft = '20%';
+                containerElement.style.marginRight = '20%';
+                containerElement.style.textTransform = 'none';
+            } else if (currentMargin === '20%') {
+                containerElement.style.marginLeft = '0px';
+                containerElement.style.marginRight = '0px';
+                containerElement.style.textTransform = 'uppercase';
+            }
+            triggerAutosave();
+        }
+
+        function addAVRow() {
+            const newRow = document.createElement('div');
+            newRow.className = 'av-row';
+            newRow.innerHTML = `
+                <div class="av-cell" contenteditable="true" spellcheck="false"></div>
+                <div class="av-cell" contenteditable="true" spellcheck="false"></div>
+            `;
+            avRowsWrapper.appendChild(newRow);
+            triggerAutosave();
+        }
+
+        function saveContent(mode) {
+            if (mode === 'A/V') {
+                const rowsData = [];
+                document.querySelectorAll('#avRowsWrapper .av-row').forEach(row => {
+                    const cells = row.querySelectorAll('.av-cell');
+                    rowsData.push({
+                        visual: cells[0].innerHTML,
+                        audio: cells[1].innerHTML
+                    });
+                });
+                localStorage.setItem(STORAGE_KEYS['A/V'], JSON.stringify(rowsData));
+            } else {
+                localStorage.setItem(STORAGE_KEYS[mode], editor.innerHTML);
+            }
+        }
+
+        function loadContent(mode) {
+            const storedData = localStorage.getItem(STORAGE_KEYS[mode]);
+            
+            if (mode === 'A/V') {
+                avRowsWrapper.innerHTML = '';
+                if (storedData) {
+                    const parsedRows = JSON.parse(storedData);
+                    if (parsedRows.length > 0) {
+                        parsedRows.forEach(rowData => {
+                            const row = document.createElement('div');
+                            row.className = 'av-row';
+                            row.innerHTML = `
+                                <div class="av-cell" contenteditable="true" spellcheck="false">${rowData.visual}</div>
+                                <div class="av-cell" contenteditable="true" spellcheck="false">${rowData.audio}</div>
+                            `;
+                            avRowsWrapper.appendChild(row);
+                        });
+                        return;
+                    }
+                }
+                addAVRow();
+            } else {
+                editor.innerHTML = storedData || (mode === 'Screenplay' ? '<div>INT. SCENE HEADLINE - DAY</div><div></div>' : '<div></div>');
+            }
+        }
+
+        function updateFontFamily(fontValue) {
+            document.documentElement.style.setProperty('--font-family', fontValue);
+        }
+
+        function adjustZoom(direction) {
+            currentZoom += direction * 2;
+            if (currentZoom < 10) currentZoom = 10;
+            if (currentZoom > 36) currentZoom = 36;
+            document.documentElement.style.setProperty('--font-size', currentZoom + 'px');
+        }
+
+        // Hex Code text strings + Picker synchronizations 
+        function syncColorInput(target, value) {
+            if (!value.startsWith('#')) {
+                if (value.length === 6 || value.length === 3) value = '#' + value;
+            }
+            
+            // Validate structural pattern limits before layout overrides occur
+            const hexRegex = /^#[0-9A-F]{6}$/i;
+            
+            if (target === 'bg') {
+                document.getElementById('bgColorPicker').value = value;
+                document.getElementById('bgColorHex').value = value;
+                if (currentMode !== 'Screenplay') document.documentElement.style.setProperty('--bg-color', value);
+                updateStoredTheme('bg', value);
+            } else if (target === 'text') {
+                document.getElementById('textColorPicker').value = value;
+                document.getElementById('textColorHex').value = value;
+                if (currentMode !== 'Screenplay') document.documentElement.style.setProperty('--text-color', value);
+                updateStoredTheme('text', value);
+            } else if (target === 'panel') {
+                document.getElementById('panelColorPicker').value = value;
+                document.getElementById('panelColorHex').value = value;
+                document.documentElement.style.setProperty('--panel-bg', value);
+                updateStoredTheme('panel', value);
+            }
+        }
+
+        function updateStoredTheme(key, val) {
+            const storedTheme = JSON.parse(localStorage.getItem(STORAGE_KEYS.Theme) || '{}');
+            storedTheme[key] = val;
+            localStorage.setItem(STORAGE_KEYS.Theme, JSON.stringify(storedTheme));
+        }
+
+        function loadThemeSettings() {
+            const storedTheme = JSON.parse(localStorage.getItem(STORAGE_KEYS.Theme) || '{}');
+            if (storedTheme.bg) {
+                document.documentElement.style.setProperty('--bg-color', storedTheme.bg);
+                document.getElementById('bgColorPicker').value = storedTheme.bg;
+                document.getElementById('bgColorHex').value = storedTheme.bg;
+            }
+            if (storedTheme.text) {
+                document.documentElement.style.setProperty('--text-color', storedTheme.text);
+                document.getElementById('textColorPicker').value = storedTheme.text;
+                document.getElementById('textColorHex').value = storedTheme.text;
+            }
+            if (storedTheme.panel) {
+                document.documentElement.style.setProperty('--panel-bg', storedTheme.panel);
+                document.getElementById('panelColorPicker').value = storedTheme.panel;
+                document.getElementById('panelColorHex').value = storedTheme.panel;
+            }
+        }
+
+        function setupContextMenu() {
+            const targetCanvas = document.getElementById('editorContainer');
+            
+            targetCanvas.addEventListener('contextmenu', (e) => {
+                if (window.getSelection().toString().trim().length > 0) {
+                    e.preventDefault();
+                    contextMenu.style.display = 'block';
+                    contextMenu.style.left = `${e.clientX}px`;
+                    contextMenu.style.top = `${e.clientY}px`;
+                }
+            });
+
+            document.addEventListener('click', () => {
+                contextMenu.style.display = 'none';
+            });
+        }
+
+        function applyHighlight(colorValue) {
+            document.execCommand('styleWithCSS', false, true);
+            document.execCommand('foreColor', false, colorValue);
+            triggerAutosave();
+        }
+
+        function exportTXT() {
+            let outputText = "";
+            const timestamp = new Date().toISOString().slice(0,10);
+            
+            if (currentMode === 'A/V') {
+                document.querySelectorAll('#avRowsWrapper .av-row').forEach((row, idx) => {
+                    const cells = row.querySelectorAll('.av-cell');
+                    outputText += `[SCENE SEQUENCE ${idx + 1}]\n`;
+                    outputText += `VISUAL:\n${cells[0].innerText}\n\n`;
+                    outputText += `AUDIO:\n${cells[1].innerText}\n`;
+                    outputText += `==================================================\n\n`;
+                });
+            } else {
+                outputText = editor.innerText;
+            }
+
+            const textBlob = new Blob([outputText], { type: 'text/plain;charset=utf-8' });
+            const downloaderElement = document.createElement('a');
+            downloaderElement.href = URL.createObjectURL(textBlob);
+            downloaderElement.download = `DRAFT_ROOM_${currentMode.toUpperCase()}_${timestamp}.txt`;
+            downloaderElement.click();
+            URL.revokeObjectURL(downloaderElement.href);
+        }
+
+        function exportPDF() {
+            window.print();
+        }
+    </script>
+</body>
+</html>
