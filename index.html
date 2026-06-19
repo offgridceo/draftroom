@@ -217,6 +217,87 @@
             font-family: inherit;
         }
 
+        /* Internal Saved Drafts Sliding Drawer Panel Overlay */
+        .drafts-panel {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 320px;
+            height: 100%;
+            background-color: var(--panel-bg);
+            border-right: 2px solid var(--border-color);
+            z-index: 50;
+            display: flex;
+            flex-direction: column;
+            transform: translateX(-100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 20px;
+        }
+
+        .drafts-panel.open {
+            transform: translateX(0);
+        }
+
+        .drafts-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 1.1rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .drafts-list {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .draft-item {
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            transition: border-color 0.2s;
+        }
+
+        .draft-item:hover {
+            border-color: var(--accent-color);
+        }
+
+        .draft-item-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #ffffff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .draft-item-meta {
+            font-size: 0.75rem;
+            color: #71717a;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .draft-delete-btn {
+            background: transparent;
+            border: none;
+            color: #ef4444;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
         /* Editor Wrapper Container */
         .editor-container {
             flex: 1;
@@ -359,7 +440,7 @@
                 overflow: visible !important;
                 height: auto !important;
             }
-            header, .settings-sidebar, .custom-context-menu, .add-row-btn, .control-btn {
+            header, .settings-sidebar, .drafts-panel, .custom-context-menu, .add-row-btn, .control-btn {
                 display: none !important;
             }
             .editor-container {
@@ -396,9 +477,10 @@
 <body>
 
     <header>
-        <div style="display: flex; align-items: center; gap: 16px;">
+        <div style="display: flex; align-items: center; gap: 12px;">
             <button class="control-btn" id="globalSidebarToggle" onclick="toggleSidebar()" style="font-size:1.15rem; padding: 6px 12px;" title="Toggle Sidebar Panel">☰</button>
-            <div class="brand">DRAFT ROOM</div>
+            <button class="control-btn" onclick="toggleDraftsPanel()" style="font-size: 0.85rem;" title="Open Saved Drafts Matrix">🗂️ Saved Drafts</button>
+            <div class="brand" style="margin-left: 8px;">DRAFT ROOM</div>
         </div>
         
         <div class="modes">
@@ -408,6 +490,7 @@
         </div>
 
         <div class="actions">
+            <button class="control-btn" style="border-color: var(--accent-color);" onclick="promptSaveDraft()">Save To Room (Ctrl+S)</button>
             <button class="control-btn" onclick="exportTXT()">Export TXT</button>
             <button class="control-btn" onclick="exportPDF()">Export PDF</button>
         </div>
@@ -415,6 +498,15 @@
 
     <div class="workspace">
         
+        <div class="drafts-panel" id="draftsPanel">
+            <div class="drafts-header">
+                <span>SAVED DRAFTS</span>
+                <button class="control-btn" style="padding: 4px 8px;" onclick="toggleDraftsPanel()">✕</button>
+            </div>
+            <div class="drafts-list" id="draftsListContainer">
+                </div>
+        </div>
+
         <aside class="settings-sidebar" id="sidebarPanel">
             <div class="setting-group">
                 <label>Typography</label>
@@ -501,17 +593,21 @@
         const avRowsWrapper = document.getElementById('avRowsWrapper');
         const contextMenu = document.getElementById('contextMenu');
         const sidebarPanel = document.getElementById('sidebarPanel');
+        const draftsPanel = document.getElementById('draftsPanel');
+        const draftsListContainer = document.getElementById('draftsListContainer');
         
         let currentMode = 'Lyrics';
         let currentZoom = 16;
         let autosaveTimeout = null;
+        let activeDraftId = null; // Tracks current loaded distinct workspace target file
 
         const STORAGE_KEYS = {
             Lyrics: 'draftroom_lyrics_content',
             'A/V': 'draftroom_av_content',
             Screenplay: 'draftroom_screenplay_content',
             Theme: 'draftroom_theme_config',
-            Font: 'draftroom_font_config'
+            Font: 'draftroom_font_config',
+            DraftsIndex: 'draftroom_internal_manifest'
         };
 
         const VALID_COMMANDS = ['/verse', '/chorus', '/hook', '/bridge', '/intro', '/outro', '/pre-chorus'];
@@ -522,6 +618,8 @@
             loadContent(currentMode);
             setupEditorListeners();
             setupContextMenu();
+            renderDraftsList();
+            setupGlobalShortcuts();
         });
 
         function setupEditorListeners() {
@@ -544,20 +642,40 @@
             });
         }
 
+        function setupGlobalShortcuts() {
+            window.addEventListener('keydown', (e) => {
+                if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+                    e.preventDefault();
+                    promptSaveDraft();
+                }
+            });
+        }
+
         function toggleSidebar() {
             sidebarPanel.classList.toggle('collapsed');
+        }
+
+        function toggleDraftsPanel() {
+            draftsPanel.classList.toggle('open');
+            if (draftsPanel.classList.contains('open')) {
+                renderDraftsList();
+            }
         }
 
         function triggerAutosave() {
             clearTimeout(autosaveTimeout);
             autosaveTimeout = setTimeout(() => {
                 saveContent(currentMode);
+                if (activeDraftId) {
+                    saveActiveDraftSilently();
+                }
             }, 300); 
         }
 
         function switchMode(selectedMode) {
             saveContent(currentMode);
             currentMode = selectedMode;
+            activeDraftId = null; // Decouple explicit pointer manifest references on mode flip
 
             document.querySelectorAll('.mode-btn').forEach(btn => {
                 btn.classList.toggle('active', btn.innerText === selectedMode);
@@ -694,6 +812,169 @@
             }
         }
 
+        /* Named Internal Workspace Storage Layer Realization Matrix */
+        function promptSaveDraft() {
+            let manifest = JSON.parse(localStorage.getItem(STORAGE_KEYS.DraftsIndex) || '[]');
+            let existingName = "";
+            
+            if (activeDraftId) {
+                const activeRecord = manifest.find(d => d.id === activeDraftId);
+                if (activeRecord) existingName = activeRecord.title;
+            }
+
+            const titleInput = prompt("Enter a title for this file layout script:", existingName || "Untitled Composition");
+            if (titleInput === null || titleInput.trim() === "") return;
+
+            let currentPayload = "";
+            if (currentMode === 'A/V') {
+                const rowsData = [];
+                document.querySelectorAll('#avRowsWrapper .av-row').forEach(row => {
+                    const cells = row.querySelectorAll('.av-cell');
+                    rowsData.push({ visual: cells[0].innerHTML, audio: cells[1].innerHTML });
+                });
+                currentPayload = JSON.stringify(rowsData);
+            } else {
+                currentPayload = editor.innerHTML;
+            }
+
+            if (activeDraftId) {
+                manifest = manifest.map(d => {
+                    if (d.id === activeDraftId) {
+                        d.title = titleInput.trim();
+                        d.timestamp = new Date().toLocaleString();
+                        d.payload = currentPayload;
+                    }
+                    return d;
+                });
+            } else {
+                const uniqueId = 'draft_' + Date.now();
+                manifest.push({
+                    id: uniqueId,
+                    title: titleInput.trim(),
+                    mode: currentMode,
+                    timestamp: new Date().toLocaleString(),
+                    payload: currentPayload
+                });
+                activeDraftId = uniqueId;
+            }
+
+            localStorage.setItem(STORAGE_KEYS.DraftsIndex, JSON.stringify(manifest));
+            renderDraftsList();
+        }
+
+        function saveActiveDraftSilently() {
+            let manifest = JSON.parse(localStorage.getItem(STORAGE_KEYS.DraftsIndex) || '[]');
+            let currentPayload = "";
+            
+            if (currentMode === 'A/V') {
+                const rowsData = [];
+                document.querySelectorAll('#avRowsWrapper .av-row').forEach(row => {
+                    const cells = row.querySelectorAll('.av-cell');
+                    rowsData.push({ visual: cells[0].innerHTML, audio: cells[1].innerHTML });
+                });
+                currentPayload = JSON.stringify(rowsData);
+            } else {
+                currentPayload = editor.innerHTML;
+            }
+
+            manifest = manifest.map(d => {
+                if (d.id === activeDraftId) {
+                    d.payload = currentPayload;
+                    d.timestamp = new Date().toLocaleString();
+                }
+                return d;
+            });
+            localStorage.setItem(STORAGE_KEYS.DraftsIndex, JSON.stringify(manifest));
+        }
+
+        function renderDraftsList() {
+            const manifest = JSON.parse(localStorage.getItem(STORAGE_KEYS.DraftsIndex) || '[]');
+            draftsListContainer.innerHTML = "";
+
+            if (manifest.length === 0) {
+                draftsListContainer.innerHTML = `<div style="text-align:center; color:#71717a; margin-top:20px; font-size:0.85rem;">No internal files saved yet.</div>`;
+                return;
+            }
+
+            manifest.reverse().forEach(draft => {
+                const draftItem = document.createElement('div');
+                draftItem.className = 'draft-item';
+                if (activeDraftId === draft.id) draftItem.style.borderColor = 'var(--accent-color)';
+                
+                draftItem.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span class="draft-item-title">${draft.title}</span>
+                        <button class="draft-delete-btn" onclick="deleteDraft(event, '${draft.id}')">✕</button>
+                    </div>
+                    <div class="draft-item-meta">
+                        <span>${draft.mode}</span>
+                        <span>${draft.timestamp.split(',')[0]}</span>
+                    </div>
+                `;
+                draftItem.addEventListener('click', () => loadDraftWorkspace(draft.id));
+                draftsListContainer.appendChild(draftItem);
+            });
+        }
+
+        function loadDraftWorkspace(id) {
+            const manifest = JSON.parse(localStorage.getItem(STORAGE_KEYS.DraftsIndex) || '[]');
+            const targetedRecord = manifest.find(d => d.id === id);
+            if (!targetedRecord) return;
+
+            activeDraftId = targetedRecord.id;
+            
+            // Sync engine structure cleanly first
+            currentMode = targetedRecord.mode;
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.innerText === currentMode);
+            });
+
+            editor.className = 'editor-paper';
+            editor.style.display = 'block';
+            avContainer.style.display = 'none';
+
+            const storedTheme = JSON.parse(localStorage.getItem(STORAGE_KEYS.Theme) || '{}');
+            document.documentElement.style.setProperty('--bg-color', storedTheme.bg || '#121214');
+            document.documentElement.style.setProperty('--text-color', storedTheme.text || '#e2e8f0');
+
+            if (currentMode === 'Lyrics') {
+                editor.classList.add('mode-lyrics');
+                editor.innerHTML = targetedRecord.payload;
+            } else if (currentMode === 'A/V') {
+                editor.style.display = 'none';
+                avContainer.style.display = 'flex';
+                avRowsWrapper.innerHTML = '';
+                const parsedRows = JSON.parse(targetedRecord.payload);
+                parsedRows.forEach(rowData => {
+                    const row = document.createElement('div');
+                    row.className = 'av-row';
+                    row.innerHTML = `
+                        <div class="av-cell" contenteditable="true" spellcheck="false">${rowData.visual}</div>
+                        <div class="av-cell" contenteditable="true" spellcheck="false">${rowData.audio}</div>
+                    `;
+                    avRowsWrapper.appendChild(row);
+                });
+            } else if (currentMode === 'Screenplay') {
+                editor.classList.add('mode-screenplay');
+                editor.innerHTML = targetedRecord.payload;
+            }
+            
+            toggleDraftsPanel();
+            saveContent(currentMode); // Keep persistent primary buffer active in sync
+        }
+
+        function deleteDraft(event, id) {
+            event.stopPropagation();
+            if (!confirm("Confirm complete deletion of this saved script?")) return;
+            
+            let manifest = JSON.parse(localStorage.getItem(STORAGE_KEYS.DraftsIndex) || '[]');
+            manifest = manifest.filter(d => d.id !== id);
+            localStorage.setItem(STORAGE_KEYS.DraftsIndex, JSON.stringify(manifest));
+            
+            if (activeDraftId === id) activeDraftId = null;
+            renderDraftsList();
+        }
+
         function updateFontFamily(fontValue) {
             document.documentElement.style.setProperty('--font-family', fontValue);
             localStorage.setItem(STORAGE_KEYS.Font, fontValue);
@@ -763,9 +1044,15 @@
             });
         }
 
+        /* Mouse Selection Highlight Custom Context Processing Vector Fix */
         function applyHighlight(colorValue) {
+            const selection = window.getSelection();
+            if (!selection.rangeCount || selection.toString().trim().length === 0) return;
+            
+            // CSS compilation driver mapping limits mutations explicitly to active selected text slices only
             document.execCommand('styleWithCSS', false, true);
             document.execCommand('foreColor', false, colorValue);
+            
             triggerAutosave();
         }
 
