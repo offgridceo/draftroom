@@ -67,36 +67,17 @@
             border-radius: 2px;
         }
 
-        .modes {
-            display: flex;
-            gap: 4px;
-            background-color: var(--bg-color);
-            padding: 4px;
-            border-radius: 6px;
-            border: 1px solid var(--border-color);
-        }
-
-        .mode-btn {
-            background: transparent;
-            border: none;
-            color: #71717a;
-            padding: 8px 16px;
+        /* Subtle Mode Indicator Staged Centered */
+        .mode-status-indicator {
             font-family: 'Space Grotesk', sans-serif;
-            font-weight: 600;
-            font-size: 0.9rem;
-            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            color: #71717a;
+            text-transform: uppercase;
+            background: var(--bg-color);
+            padding: 6px 14px;
             border-radius: 4px;
-            transition: all 0.2s ease;
-        }
-
-        .mode-btn:hover {
-            color: var(--text-color);
-        }
-
-        .mode-btn.active {
-            background-color: var(--panel-bg);
-            color: #ffffff;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
             border: 1px solid var(--border-color);
         }
 
@@ -480,15 +461,11 @@
         <div style="display: flex; align-items: center; gap: 12px;">
             <button class="control-btn" id="globalSidebarToggle" onclick="toggleSidebar()" style="font-size:1.15rem; padding: 6px 12px;" title="Toggle Sidebar Panel">☰</button>
             <button class="control-btn" onclick="toggleDraftsPanel()" style="font-size: 0.85rem;" title="Open Saved Drafts Matrix">🗂️ Saved Drafts</button>
+            <button class="control-btn" onclick="triggerNewDraftFlow()" style="font-size: 0.85rem; font-weight: 700; border-color: var(--accent-color);" title="Instantiate Blank Workspace Layout">+ New Draft</button>
             <div class="brand" style="margin-left: 8px;">DRAFT ROOM</div>
         </div>
         
-        <div class="modes">
-            <button class="mode-btn active" onclick="switchMode('Lyrics')">Lyrics</button>
-            <button class="mode-btn" onclick="switchMode('A/V')">A/V</button>
-            <button class="mode-btn" onclick="switchMode('Screenplay')">Screenplay</button>
-            <button class="mode-btn" onclick="switchMode('Random')">Random</button>
-        </div>
+        <div class="mode-status-indicator" id="headerModeIndicator">[ Lyrics Active ]</div>
 
         <div class="actions">
             <button class="control-btn" onclick="exportTXT()">Export TXT</button>
@@ -595,6 +572,7 @@
         const sidebarPanel = document.getElementById('sidebarPanel');
         const draftsPanel = document.getElementById('draftsPanel');
         const draftsListContainer = document.getElementById('draftsListContainer');
+        const headerModeIndicator = document.getElementById('headerModeIndicator');
         
         let currentMode = 'Lyrics';
         let currentZoom = 16;
@@ -621,6 +599,7 @@
             setupContextMenu();
             renderDraftsList();
             setupGlobalShortcuts();
+            updateHeaderModeIndicator();
         });
 
         function setupEditorListeners() {
@@ -673,14 +652,60 @@
             }, 300); 
         }
 
+        /* Re-engineered Isolated Format Selection Setup Mechanics */
+        function triggerNewDraftFlow() {
+            const rawChoice = prompt("Select dynamic blueprint layout structure type:\n1 = Lyrics\n2 = A/V\n3 = Screenplay\n4 = Random", "1");
+            if (rawChoice === null) return;
+
+            let targetMode = "Lyrics";
+            if (rawChoice === "2") targetMode = "A/V";
+            else if (rawChoice === "3") targetMode = "Screenplay";
+            else if (rawChoice === "4") targetMode = "Random";
+
+            // Uncouple current draft link vectors entirely to provide an isolated blank working profile canvas
+            activeDraftId = null; 
+            currentMode = targetMode;
+
+            executeCanvasResetLayout(targetMode);
+        }
+
+        function executeCanvasResetLayout(selectedMode) {
+            editor.className = 'editor-paper';
+            editor.style.display = 'block';
+            avContainer.style.display = 'none';
+
+            const storedTheme = JSON.parse(localStorage.getItem(STORAGE_KEYS.Theme) || '{}');
+            document.documentElement.style.setProperty('--bg-color', storedTheme.bg || '#121214');
+            document.documentElement.style.setProperty('--text-color', storedTheme.text || '#e2e8f0');
+
+            if (selectedMode === 'Lyrics') {
+                editor.classList.add('mode-lyrics');
+                editor.innerHTML = '<div></div>';
+            } else if (selectedMode === 'A/V') {
+                editor.style.display = 'none';
+                avContainer.style.display = 'flex';
+                avRowsWrapper.innerHTML = '';
+                addAVRow();
+            } else if (selectedMode === 'Screenplay') {
+                editor.classList.add('mode-screenplay');
+                editor.innerHTML = '<div>INT. SCENE HEADLINE - DAY</div><div></div>';
+            } else if (selectedMode === 'Random') {
+                editor.classList.add('mode-random');
+                editor.innerHTML = '<div></div>';
+            }
+
+            updateHeaderModeIndicator();
+            saveContent(selectedMode);
+        }
+
+        function updateHeaderModeIndicator() {
+            headerModeIndicator.innerText = `[ ${currentMode} Active ]`;
+        }
+
         function switchMode(selectedMode) {
             saveContent(currentMode);
             currentMode = selectedMode;
             activeDraftId = null;
-
-            document.querySelectorAll('.mode-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.innerText === selectedMode);
-            });
 
             editor.className = 'editor-paper';
             editor.style.display = 'block';
@@ -704,6 +729,7 @@
                 editor.classList.add('mode-random');
                 loadContent('Random');
             }
+            updateHeaderModeIndicator();
         }
 
         function processSlashCommands() {
@@ -910,7 +936,7 @@
                         <button class="draft-delete-btn" onclick="deleteDraft(event, '${draft.id}')">✕</button>
                     </div>
                     <div class="draft-item-meta">
-                        <span>${draft.mode}</span>
+                        <span style="color: var(--accent-color); font-weight:500;">${draft.mode}</span>
                         <span>${draft.timestamp.split(',')[0]}</span>
                     </div>
                 `;
@@ -926,10 +952,6 @@
 
             activeDraftId = targetedRecord.id;
             currentMode = targetedRecord.mode;
-            
-            document.querySelectorAll('.mode-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.innerText === currentMode);
-            });
 
             editor.className = 'editor-paper';
             editor.style.display = 'block';
@@ -965,6 +987,7 @@
             }
             
             toggleDraftsPanel();
+            updateHeaderModeIndicator();
             saveContent(currentMode);
         }
 
