@@ -603,6 +603,40 @@
         });
 
         function setupEditorListeners() {
+            // Shift + Enter Content-Escape Matrix Listener Core
+            editor.addEventListener('keydown', (e) => {
+                if (e.shiftKey && e.key === 'Enter') {
+                    const selection = window.getSelection();
+                    if (!selection.rangeCount) return;
+
+                    let rangeNode = selection.getRangeAt(0).startContainer;
+                    // Move upstream to evaluate node tag wrappers
+                    while (rangeNode && rangeNode !== editor) {
+                        if (rangeNode.nodeName === 'A') {
+                            e.preventDefault();
+                            
+                            // Break path and instantiate clean neutral element row below current scope bounds
+                            const escapeBreakDiv = document.createElement('div');
+                            escapeBreakDiv.innerHTML = '<br>';
+                            
+                            // Insert breaking container node immediately after the parental link tag reference bounds
+                            rangeNode.parentNode.insertBefore(escapeBreakDiv, rangeNode.nextSibling);
+                            
+                            // Safely route focus context target to new line container
+                            const newSelectionRange = document.createRange();
+                            newSelectionRange.setStart(escapeBreakDiv, 0);
+                            newSelectionRange.collapse(true);
+                            selection.removeAllRanges();
+                            selection.addRange(newSelectionRange);
+                            
+                            triggerAutosave();
+                            return;
+                        }
+                        rangeNode = rangeNode.parentNode;
+                    }
+                }
+            });
+
             editor.addEventListener('input', () => {
                 triggerAutosave();
                 if (currentMode === 'Lyrics') {
@@ -652,7 +686,6 @@
             }, 300); 
         }
 
-        /* Re-engineered Isolated Format Selection Setup Mechanics */
         function triggerNewDraftFlow() {
             const rawChoice = prompt("Select dynamic blueprint layout structure type:\n1 = Lyrics\n2 = A/V\n3 = Screenplay\n4 = Random", "1");
             if (rawChoice === null) return;
@@ -662,7 +695,6 @@
             else if (rawChoice === "3") targetMode = "Screenplay";
             else if (rawChoice === "4") targetMode = "Random";
 
-            // Uncouple current draft link vectors entirely to provide an isolated blank working profile canvas
             activeDraftId = null; 
             currentMode = targetMode;
 
