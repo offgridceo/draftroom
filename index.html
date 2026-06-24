@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DRAFT ROOM</title>
+    <!-- Google Fonts for Styling Variations Restored -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&family=JetBrains+Mono:wght@300;400;500;700&family=Inter:wght@300;400;600;700&family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
@@ -301,10 +302,23 @@
             line-height: 1.5;
         }
 
-        /* LYRICS AND RANDOM MODE */
-        .editor-paper.mode-lyrics, .editor-paper.mode-random {
+        /* LYRICS, RANDOM AND CODE MODE */
+        .editor-paper.mode-lyrics, .editor-paper.mode-random, .editor-paper.mode-code {
             white-space: pre-wrap;
         }
+
+        /* Special Engine Modifications for Code Canvas Matrix */
+        .editor-paper.mode-code {
+            font-family: 'JetBrains Mono', monospace !important;
+        }
+
+        /* Inline Syntax Highlighting Tokens (GitHub Dark Inspired Matrix) */
+        .code-keyword { color: #ff7b72; font-weight: bold; }
+        .code-string { color: #a5d6ff; }
+        .code-number { color: #79c0ff; }
+        .code-function { color: #d2a8ff; }
+        .code-comment { color: #8b949e; font-style: italic; }
+        .code-bracket { color: #ffa657; }
 
         /* A/V MODE (Split Layout Table) */
         .av-container {
@@ -457,6 +471,7 @@
 </head>
 <body>
 
+    <!-- Header Control Bar -->
     <header>
         <div style="display: flex; align-items: center; gap: 12px;">
             <button class="control-btn" id="globalSidebarToggle" onclick="toggleSidebar()" style="font-size:1.15rem; padding: 6px 12px;" title="Toggle Sidebar Panel">☰</button>
@@ -465,6 +480,7 @@
             <div class="brand" style="margin-left: 8px;">DRAFT ROOM</div>
         </div>
         
+        <!-- Subtle Non-Intrusive Engine Status Indicator -->
         <div class="mode-status-indicator" id="headerModeIndicator">[ Lyrics Active ]</div>
 
         <div class="actions">
@@ -473,17 +489,21 @@
         </div>
     </header>
 
+    <!-- Main Dynamic Workspace Structure -->
     <div class="workspace">
         
+        <!-- Internal Saved Drafts Drawer Architecture -->
         <div class="drafts-panel" id="draftsPanel">
             <div class="drafts-header">
                 <span>SAVED DRAFTS</span>
                 <button class="control-btn" style="padding: 4px 8px;" onclick="toggleDraftsPanel()">✕</button>
             </div>
             <div class="drafts-list" id="draftsListContainer">
-                </div>
+                <!-- Dynamically populated via local state mappings -->
+            </div>
         </div>
 
+        <!-- Workspace Customization Sidebar Controls -->
         <aside class="settings-sidebar" id="sidebarPanel">
             <div class="setting-group">
                 <label>Typography</label>
@@ -525,10 +545,13 @@
             </div>
         </aside>
 
+        <!-- Dynamic Output Editor Canvas -->
         <div class="editor-container" id="editorContainer">
             
+            <!-- Standard Continuous Contenteditable Canvas -->
             <div class="editor-paper mode-lyrics" id="editor" contenteditable="true" spellcheck="false"></div>
 
+            <!-- Integrated Structural A/V Double Columns Node -->
             <div class="av-container" id="avContainer">
                 <div class="av-header-row">
                     <div class="av-header-cell">Visual Execution</div>
@@ -546,6 +569,7 @@
         </div>
     </div>
 
+    <!-- Right-Click Context Menu for Structural Text Highlighting Colors -->
     <div class="custom-context-menu" id="contextMenu">
         <div class="menu-item" onclick="applyHighlight('#ffffff')">
             <div class="color-dot" style="background: #ffffff;"></div> Default
@@ -578,12 +602,14 @@
         let currentZoom = 16;
         let autosaveTimeout = null;
         let activeDraftId = null;
+        let isColoringCode = false; // Mutex flag preventing input update infinite loop traps
 
         const STORAGE_KEYS = {
             Lyrics: 'draftroom_lyrics_content',
             'A/V': 'draftroom_av_content',
             Screenplay: 'draftroom_screenplay_content',
             Random: 'draftroom_random_content',
+            Code: 'draftroom_code_content',
             Theme: 'draftroom_theme_config',
             Font: 'draftroom_font_config',
             DraftsIndex: 'draftroom_internal_manifest'
@@ -610,19 +636,13 @@
                     if (!selection.rangeCount) return;
 
                     let rangeNode = selection.getRangeAt(0).startContainer;
-                    // Move upstream to evaluate node tag wrappers
                     while (rangeNode && rangeNode !== editor) {
                         if (rangeNode.nodeName === 'A') {
                             e.preventDefault();
-                            
-                            // Break path and instantiate clean neutral element row below current scope bounds
                             const escapeBreakDiv = document.createElement('div');
                             escapeBreakDiv.innerHTML = '<br>';
-                            
-                            // Insert breaking container node immediately after the parental link tag reference bounds
                             rangeNode.parentNode.insertBefore(escapeBreakDiv, rangeNode.nextSibling);
                             
-                            // Safely route focus context target to new line container
                             const newSelectionRange = document.createRange();
                             newSelectionRange.setStart(escapeBreakDiv, 0);
                             newSelectionRange.collapse(true);
@@ -635,12 +655,42 @@
                         rangeNode = rangeNode.parentNode;
                     }
                 }
+
+                // Code Mode Engineering Input Hooks (Tab Indentation + Auto brackets closing)
+                if (currentMode === 'Code') {
+                    if (e.key === 'Tab') {
+                        e.preventDefault();
+                        document.execCommand('insertText', false, '    ');
+                    }
+                    
+                    const openClosePairs = { '{': '}', '(': ')', '[': ']', '"': '"', "'": "'" };
+                    if (openClosePairs[e.key] !== undefined) {
+                        e.preventDefault();
+                        const matchingClosingChar = openClosePairs[e.key];
+                        const cursorSelection = window.getSelection();
+                        const cursorRange = cursorSelection.getRangeAt(0);
+                        
+                        const bracketContainerSpan = document.createElement('span');
+                        bracketContainerSpan.innerText = e.key + matchingClosingChar;
+                        cursorRange.insertNode(bracketContainerSpan);
+                        
+                        // Shift cursor focus backwards inside the generated elements bounds
+                        cursorRange.setStart(bracketContainerSpan.firstChild, 1);
+                        cursorRange.collapse(true);
+                        cursorSelection.removeAllRanges();
+                        cursorSelection.addRange(cursorRange);
+                        triggerAutosave();
+                    }
+                }
             });
 
             editor.addEventListener('input', () => {
                 triggerAutosave();
                 if (currentMode === 'Lyrics') {
                     processSlashCommands();
+                }
+                if (currentMode === 'Code' && !isColoringCode) {
+                    processSyntaxHighlighting();
                 }
             });
 
@@ -687,13 +737,14 @@
         }
 
         function triggerNewDraftFlow() {
-            const rawChoice = prompt("Select dynamic blueprint layout structure type:\n1 = Lyrics\n2 = A/V\n3 = Screenplay\n4 = Random", "1");
+            const rawChoice = prompt("Select dynamic blueprint layout structure type:\n1 = Lyrics\n2 = A/V\n3 = Screenplay\n4 = Random\n5 = Code", "1");
             if (rawChoice === null) return;
 
             let targetMode = "Lyrics";
             if (rawChoice === "2") targetMode = "A/V";
             else if (rawChoice === "3") targetMode = "Screenplay";
             else if (rawChoice === "4") targetMode = "Random";
+            else if (rawChoice === "5") targetMode = "Code";
 
             activeDraftId = null; 
             currentMode = targetMode;
@@ -723,6 +774,9 @@
                 editor.innerHTML = '<div>INT. SCENE HEADLINE - DAY</div><div></div>';
             } else if (selectedMode === 'Random') {
                 editor.classList.add('mode-random');
+                editor.innerHTML = '<div></div>';
+            } else if (selectedMode === 'Code') {
+                editor.classList.add('mode-code');
                 editor.innerHTML = '<div></div>';
             }
 
@@ -760,8 +814,97 @@
             } else if (selectedMode === 'Random') {
                 editor.classList.add('mode-random');
                 loadContent('Random');
+            } else if (selectedMode === 'Code') {
+                editor.classList.add('mode-code');
+                loadContent('Code');
+                processSyntaxHighlighting();
             }
             updateHeaderModeIndicator();
+        }
+
+        // Lightweight Real-time Real Web Dev Engineering Syntax Highlighting Module
+        function processSyntaxHighlighting() {
+            isColoringCode = true;
+            const currentSelection = window.getSelection();
+            if (!currentSelection.rangeCount) { isColoringCode = false; return; }
+
+            // Document text offsets mapping context calculations to hold caret positions solid
+            const savedCaretOffset = getCaretCharacterOffsetWithin(editor);
+            let rawCodeString = editor.innerText;
+
+            // Protection fallback layer matrix mapping HTML entities safely inside strings
+            rawCodeString = rawCodeString.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+            // Precision RegEx Structural Parsers mapping official GitHub color distributions
+            const keywordRegex = /\b(const|let|var|function|return|class|extends|if|else|for|while|switch|case|break|import|export|from|new|this|async|await)\b/g;
+            const stringRegex = /(["'`])(.*?)\1/g;
+            const numberRegex = /\b(\d+)\b/g;
+            const functionRegex = /\b([a-zA-Z_]\w*)(?=\()/g;
+            const commentRegex = /(\/\/.*)/g;
+            const bracketRegex = /([{}()\[\]])/g;
+
+            let compiledHtml = rawCodeString
+                .replace(bracketRegex, '<span class="code-bracket">$1</span>')
+                .replace(keywordRegex, '<span class="code-keyword">$1</span>')
+                .replace(numberRegex, '<span class="code-number">$1</span>')
+                .replace(functionRegex, '<span class="code-function">$1</span>')
+                .replace(stringRegex, '<span class="code-string">$1$2$1</span>')
+                .replace(commentRegex, '<span class="code-comment">$1</span>');
+
+            // Force internal text formatting swap mapping modifications
+            editor.innerHTML = compiledHtml;
+
+            // Execute matrix position restoration pipeline to prevent formatting drops
+            setCaretPositionWithin(editor, savedCaretOffset);
+            isColoringCode = false;
+        }
+
+        function getCaretCharacterOffsetWithin(element) {
+            let caretOffset = 0;
+            const doc = element.ownerDocument || element.document;
+            const win = doc.defaultView || doc.parentWindow;
+            const sel = win.getSelection();
+            if (sel.rangeCount > 0) {
+                const range = sel.getRangeAt(0);
+                const preCaretRange = range.cloneRange();
+                preCaretRange.selectNodeContents(element);
+                preCaretRange.setEnd(range.endContainer, range.endOffset);
+                caretOffset = preCaretRange.toString().length;
+            }
+            return caretOffset;
+        }
+
+        function setCaretPositionWithin(element, offset) {
+            let charIndex = 0;
+            const range = document.createRange();
+            range.setStart(element, 0);
+            range.collapse(true);
+            
+            const nodeQueue = [element];
+            let currentNode;
+            let found = false;
+
+            while (nodeQueue.length > 0 && !found) {
+                currentNode = nodeQueue.shift();
+                if (currentNode.nodeType === 3) {
+                    const nextCharIndex = charIndex + currentNode.length;
+                    if (offset >= charIndex && offset <= nextCharIndex) {
+                        range.setStart(currentNode, offset - charIndex);
+                        range.collapse(true);
+                        found = true;
+                    }
+                    charIndex = nextCharIndex;
+                } else {
+                    let i = currentNode.childNodes.length;
+                    while (i--) {
+                        nodeQueue.unshift(currentNode.childNodes[i]);
+                    }
+                }
+            }
+
+            const sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(range);
         }
 
         function processSlashCommands() {
@@ -1016,6 +1159,10 @@
             } else if (currentMode === 'Random') {
                 editor.classList.add('mode-random');
                 editor.innerHTML = targetedRecord.payload;
+            } else if (currentMode === 'Code') {
+                editor.classList.add('mode-code');
+                editor.innerHTML = targetedRecord.payload;
+                processSyntaxHighlighting();
             }
             
             toggleDraftsPanel();
